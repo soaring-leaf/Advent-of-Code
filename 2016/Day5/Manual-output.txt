@@ -1,0 +1,63 @@
+First result is:
+437e60fc (that's six, zero)
+
+positions accounted for so far:
+0(4),1(3),2(7),3,(e),4(6),5(0),6(f),7(c)
+
+Iterations: 27 million
+
+Output:
+
+found one, hash is 0000027b9705c7e6fa3d4816c490bbfd
+found one, hash is 00000468c8625d85571d250737c47b5a
+found one, hash is 0000013e3293b49e4c78a5b43b21023b
+Checking the 3000000th iteration:
+found one, hash is 0000040bbe4509b48041007dec6123bd
+Checking the 4000000th iteration:
+Checking the 5000000th iteration:
+found one, hash is 00000b11810477f9e49840991fb2151e
+Checking the 6000000th iteration:
+Checking the 7000000th iteration:
+Checking the 8000000th iteration:
+found one, hash is 00000cc461c8945671046cf632be4473
+Checking the 9000000th iteration:
+found one, hash is 000007c1da6865df78b2c0addf28913d
+found one, hash is 00000700ce8beb0a8ffc83fa9986d577
+found one, hash is 00000d76f344ea0a8643bb2bcf0323c4
+Checking the 10000000th iteration:
+Checking the 11000000th iteration:
+Checking the 12000000th iteration:
+Checking the 13000000th iteration:
+found one, hash is 0000050301b17d598b52e2a343b80c95
+found one, hash is 000006fe7545b487de2d003f3d4e1114
+Checking the 14000000th iteration:
+Checking the 15000000th iteration:
+found one, hash is 000002d5272322770ff5e60b01455753
+Checking the 16000000th iteration:
+found one, hash is 000004f449e36332d8693c3a84f8bf70
+found one, hash is 000002f6b67f02f6c7565a041503ea65
+Checking the 17000000th iteration:
+Checking the 18000000th iteration:
+found one, hash is 0000022f1d102210cb4a6c9dd8cb6715
+Checking the 19000000th iteration:
+found one, hash is 000006fbc50b5e7d1e4c1c390bfc9370
+found one, hash is 000003e432ea631581aefcce573d56dd
+found one, hash is 00000bb78c4ed10825e030cd1c239ad1
+Checking the 20000000th iteration:
+found one, hash is 0000098a3982c7135ad8ad1999ba98a5
+found one, hash is 0000053c41ec1a808dac438da19486ac
+found one, hash is 000001922d8af3ae96feff1a35e2414f
+Checking the 21000000th iteration
+Checking the 22000000th iteration
+found one, hash is 00000379365fc17224a1e1e3b672ab02
+Checking the 23000000th iteration
+found one, hash is 00000eb02c7276f40e60a8e8e2185828
+found one, hash is 000006a9336d4ae05f2dbff912e00604
+Checking the 24000000th iteration
+found one, hash is 00000740e2fd901d7f98f007b48771cd
+found one, hash is 00000155747b21cea30ef0222d0e7f3c
+Checking the 25000000th iteration
+found one, hash is 000002f49ca6360dea1cd854d9032331
+Checking the 26000000th iteration
+Checking the 27000000th iteration
+found one, hash is 00000048d155e2c930602533209b0154

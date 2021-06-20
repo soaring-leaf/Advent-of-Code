@@ -1,0 +1,3 @@
+move position 4 to position 2
+move position 1 to position 3
+move position 0 to position 2
