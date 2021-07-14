@@ -7,8 +7,8 @@ my $mask = '';
 my $memLoc = 0;
 my $total = 0;
 
-#open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
-open(INPUT,"<","test.txt") or die "Cant' open Test.txt $!";
+open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
+#open(INPUT,"<","test.txt") or die "Cant' open Test.txt $!";
 
 while(<INPUT>) {
 	chomp;
