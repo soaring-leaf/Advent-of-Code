@@ -6,6 +6,7 @@ my @sequence = (8,5,1,12,10,0,13);
 my @test = (6,3,0);
 my $check = 0;
 my $found = 0;
+my $turn = 7;
 
 while(scalar(@sequence) < 2020) {
     $check = $sequence[0];
@@ -21,6 +22,12 @@ while(scalar(@sequence) < 2020) {
         unshift(@sequence,0);
     } else {
         $found = 0;
+    }
+
+    $turn++;
+
+    if($turn % 500000 == 0) {
+        print "On Turn $turn\n";
     }
 
     #print "Next number added is: $test[0]\n";
