@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-my @sequence = (8,5,1,12,10,0,13);
+my @sequence = (8,5,1,12,10,0,13); # push newest number on front of array
 my @test = (6,3,0);
 my $check = 0;
 my $found = 0;
@@ -36,15 +36,15 @@ print "The 2020th number: $sequence[0]\n";
 my %numMap = (); # need hash for faster lookup
 
 # reset vars
-@sequence = (13,0,10,12,1,5,8);
+@sequence = (13,0,10,12,1,5,8); # order is now Left to Right
 @test = (0,3,6);
 $check = 0;
 $turn = 0;
 
 # Init turnMap with starting numbers
-for(my $i=0;$i<scalar(@test);$i++) {
+for(my $i=0;$i<scalar(@sequence);$i++) {
     my @turnTracker = ($turn);
-    $check = $test[$i];
+    $check = $sequence[$i];
     $numMap{$check} = \@turnTracker;
     $turn++;
 }
@@ -59,13 +59,17 @@ $turn++;
 # print $numMap{$check}[1] . "\n";
 # confirmed above is working as expected!
 
-while ($turn < 2020) {
-    print "turn: $turn: number from last turn = $check\n";
+while ($turn < 30000000) {
+
+    # 'time' check
+#    if($turn % 500000 == 0) {
+#        print "turn: $turn: number from last turn = $check\n";
+#    }
 
     # last number said from previous turn must exist
     # if last number exists but only has one entry, it's only been said once
         # next number = 0
-    if(@{$numMap{$check}} == 1) { # should $num be consolidated into $check???
+    if(@{$numMap{$check}} == 1) {
         # update 0 in the hashMap, it already has two entries
         $check = 0;
         $numMap{$check}[0] = $numMap{$check}[1];
@@ -73,7 +77,6 @@ while ($turn < 2020) {
     } else {
         # if last number has more than 1 entry
         # calc next number to be said
-        print "map($check) [0,1]: " . $numMap{$check}[0] . ", " . $numMap{$check}[1] . "\n";
         $check = $numMap{$check}[1] - $numMap{$check}[0];
         # if !exists in hash, add new entry for next number
         # if new number exists in hash, then need to update the hash for that num
