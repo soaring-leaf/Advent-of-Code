@@ -52,12 +52,8 @@ while(<INPUT>) {
 
 close(INPUT);
 
-print "Bit Counter values:\n";
-
 # build the Binary Gamma and Epsilon values
 for(my $k=0;$k<12;$k++) {
-    print "Position $k: $bitPosCounterForValue1{$k}\n";
-
     if($bitPosCounterForValue1{$k} > 0) {
         $gammaBitValue = $gammaBitValue . '1';
         $epsilonBitValue = $epsilonBitValue . '0';
@@ -77,41 +73,86 @@ print "Power values - Gamma: $gamma, Epsilon: $epsilon and Power Consumption: $p
 
 
 # Part 2 - Find the O2 Generator and CO2 Scrubber ratings
-my @O2BestMatch = 0; # Value of the best matching Diagnostic Line for the O2 Generator
-my @CO2BestMatch = 0; # same for the CO2 Scrubber
+my @O2GenOptions; # Array of the Diagnostic Line options for the O2 Generator
+my @CO2ScrubOptions; # same for the CO2 Scrubber
+my $gammaLeadBit = substr(0,1,$gammaBitValue); # Value of the first bit of Gamma
 my $currO2Count = 0; # current match value for the O2 Generator
 my $currCO2Count = 0; # same for the CO2 Scrubber
-my $O2Max = 0; # largest number of bit matches for the O2 count
-my $CO2Max = 0; # same for CO2 count
-my $deviceFlag = 0; # Flag indicating match for O2 (0) or CO2 (1) when analyzing Diagnostic row
+my $maxBit = 0; # value of the bit found most frequently in the current check
+my $minBit = 0; # value of the bit found most frequently in the current check
+my $bitCount = 1; # Iterator for the Bit Position being reviewed
 
-# Run through each Diagnostic row output and determine the best match count for each device
+# Run through each Diagnostic row output and determine the diagnostic line options for each device
 for(my $m=0;$m<scalar(@diagnosticRpt);$m++) {
     my @diagnosticVal = @{$diagnosticRpt[$m]};
 
-    # gammaBitValue indicates the most common Bit value for that positon => O2 Generator
-    # epsilonBitValue indicates least common Bit values => CO2 Scrubber
-    if($diagnosticVal[0] == substr($gammaBitValue,0,1)) {
-        $deviceFlag = 0; 
-        $currO2Count++;
+    # Separate the diagnostic lines out into the device lists
+    if($diagnosticVal[0] eq $gammaLeadBit) {
+        push(@O2GenOptions,\@diagnosticVal);
     } else {
-        $deviceFlag = 1;
-        $currCO2Count++;
+        push(@CO2ScrubOptions,\@diagnosticVal);
     }
 
-    for(my $n=1;$n<scalar(@diagnosticVal);$n++) {
-        # check each bit for the given device
-        # if it fails the bitCheck for the expected value, stop the analysis
-    }
-
-    # check for improved match against current best match of the current device
-    
-    # reset values for next round of checks
-    $currO2Count = 0;
-    $currCO2Count = 0;
 }
 
+$currO2Count = scalar(@O2GenOptions);
+$currCO2Count = scalar(@CO2ScrubOptions);
+
+print "$currO2Count";
+
+# Find O2 Generator rating
+while($currO2Count > 1) {
+    print "In while with $currO2Count options remaining to check/n";
+    my @nextO2List = (); # Array to hold the next round of checks
+
+    # find most frequent bit value for current position
+    $maxBit = bitCounter(\@O2GenOptions,$bitCount,1);
+    print "max bit returned = $maxBit/n";
+    # build the next Option list from the current options
+    for(my $n=0;$n<$currO2Count;$n++) {
+        if($O2GenOptions[$n][$bitCount] == $maxBit) {
+            push(@nextO2List,$O2GenOptions[$n]);
+        }
+    }
+
+    $currO2Count = scalar(@nextO2List);
+    @O2GenOptions = @nextO2List;
+    $bitCount++;
+    print "Checked position $bitCount, have $currO2Count options remaining\n";
+}
+
+my @O2BestMatch = @{$O2GenOptions[0]};
+
+# Find CO2 Scrubber rating
+$bitCount = 1;
+
+while($currCO2Count > 1) {
+    my @nextCO2List = (); # Array to hold the next round of checks
+
+    # find most frequent bit value for current position
+    $minBit = bitCounter(\@CO2ScrubOptions,$bitCount,0);
+        
+    # build the next Option list from the current options
+    for(my $o=0;$o<$currCO2Count;$o++) {
+        if($CO2ScrubOptions[$o][$bitCount] == $maxBit) {
+            push(@nextCO2List,$CO2ScrubOptions[$o]);
+        }
+    }
+
+    $currCO2Count = scalar(@nextCO2List);
+    @CO2ScrubOptions = @nextCO2List;
+    $bitCount++;
+}
+
+my @CO2BestMatch = @{$CO2ScrubOptions[0]};
+
+# Found whitespace at end of array that needs to be removed
+pop(@O2BestMatch);
+pop(@CO2BestMatch);
+
 # pull the Binary values of the ratings and convert to Decimal and then calc the Life Support rating
+$O2GenRating = oct("0b".join('',@O2BestMatch));
+$CO2ScrubberRating = oct("0b".join('',@CO2BestMatch));
 
 $lifeSupportRating = $O2GenRating * $CO2ScrubberRating;
 
@@ -119,3 +160,46 @@ print "Life Support values - O2 Gen: $O2GenRating, CO2 Scrubber: $CO2ScrubberRat
 
 exit(0);
 #==========================================================================
+
+# Takes the current array and dives through the current bit position to find 
+# the most/least common bit value based on the device being searched for
+# Input is the Diagnostic array being evaluated, Bit Position to check, and Device Flag
+# Device Flag = 1 if O2 Generator, 0 if CO2 Scrubber
+sub bitCounter {
+    my $zeroCount = 0;
+    my $oneCount = 0;
+    my $deviceFlag = pop(@_);
+    my $pos = pop(@_);
+    my @options = @{$_[0]};
+    
+    for(my $i=0;$i<scalar(@options);$i++) {
+        if($options[$i][$pos] eq '1') {
+            $oneCount++;
+        } else {
+            $zeroCount++;
+        }
+    }
+
+    # if the counts are the same, then adjust the count based on the device
+    if($zeroCount == $oneCount) {
+        if($deviceFlag == 1) {
+            $oneCount++;
+        } else {
+            $zeroCount--;
+        }
+    }
+
+    if($deviceFlag == 1) {
+        if($oneCount > $zeroCount) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else {
+        if($zeroCount < $oneCount) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+}
