@@ -75,7 +75,11 @@ print "Power values - Gamma: $gamma, Epsilon: $epsilon and Power Consumption: $p
 # Part 2 - Find the O2 Generator and CO2 Scrubber ratings
 my @O2GenOptions; # Array of the Diagnostic Line options for the O2 Generator
 my @CO2ScrubOptions; # same for the CO2 Scrubber
-my $gammaLeadBit = substr(0,1,$gammaBitValue); # Value of the first bit of Gamma
+my @nextO2List = (); # Array to hold the next round of checks
+my @nextCO2List = (); # Array to hold the next round of checks
+my @O2BestMatch = (); # Array to hold the bit value of the O2 Generator Rating
+my @CO2BestMatch = (); #Array to hold the bit value of the CO2 Scrubber Rating
+my $gammaLeadBit = substr($gammaBitValue,0,1); # Value of the first bit of Gamma
 my $currO2Count = 0; # current match value for the O2 Generator
 my $currCO2Count = 0; # same for the CO2 Scrubber
 my $maxBit = 0; # value of the bit found most frequently in the current check
@@ -84,6 +88,7 @@ my $bitCount = 1; # Iterator for the Bit Position being reviewed
 
 # Run through each Diagnostic row output and determine the diagnostic line options for each device
 for(my $m=0;$m<scalar(@diagnosticRpt);$m++) {
+    
     my @diagnosticVal = @{$diagnosticRpt[$m]};
 
     # Separate the diagnostic lines out into the device lists
@@ -98,16 +103,13 @@ for(my $m=0;$m<scalar(@diagnosticRpt);$m++) {
 $currO2Count = scalar(@O2GenOptions);
 $currCO2Count = scalar(@CO2ScrubOptions);
 
-print "$currO2Count";
-
 # Find O2 Generator rating
 while($currO2Count > 1) {
-    print "In while with $currO2Count options remaining to check/n";
-    my @nextO2List = (); # Array to hold the next round of checks
+    @nextO2List = ();
 
     # find most frequent bit value for current position
     $maxBit = bitCounter(\@O2GenOptions,$bitCount,1);
-    print "max bit returned = $maxBit/n";
+    
     # build the next Option list from the current options
     for(my $n=0;$n<$currO2Count;$n++) {
         if($O2GenOptions[$n][$bitCount] == $maxBit) {
@@ -118,20 +120,20 @@ while($currO2Count > 1) {
     $currO2Count = scalar(@nextO2List);
     @O2GenOptions = @nextO2List;
     $bitCount++;
-    print "Checked position $bitCount, have $currO2Count options remaining\n";
 }
 
-my @O2BestMatch = @{$O2GenOptions[0]};
+@O2BestMatch = @{$O2GenOptions[0]};
 
 # Find CO2 Scrubber rating
 $bitCount = 1;
 
 while($currCO2Count > 1) {
-    my @nextCO2List = (); # Array to hold the next round of checks
+    print "In while with $currCO2Count options remaining to check\n";
+    @nextCO2List = ();
 
     # find most frequent bit value for current position
     $minBit = bitCounter(\@CO2ScrubOptions,$bitCount,0);
-        
+    print "min bit returned = $minBit\n";
     # build the next Option list from the current options
     for(my $o=0;$o<$currCO2Count;$o++) {
         if($CO2ScrubOptions[$o][$bitCount] == $maxBit) {
@@ -142,9 +144,10 @@ while($currCO2Count > 1) {
     $currCO2Count = scalar(@nextCO2List);
     @CO2ScrubOptions = @nextCO2List;
     $bitCount++;
+    print "Checked position $bitCount, have $currO2Count options remaining\n";
 }
 
-my @CO2BestMatch = @{$CO2ScrubOptions[0]};
+@CO2BestMatch = @{$CO2ScrubOptions[0]};
 
 # Found whitespace at end of array that needs to be removed
 pop(@O2BestMatch);
