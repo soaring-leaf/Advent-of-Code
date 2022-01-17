@@ -5,8 +5,11 @@ use strict;
 my @numDraw; # Array to hold the numbers in the order drawn
 my @boards; # Array to hold each Hash-board
 my $fastestWin = -1; # Count of Numbers drawn for the board with the fastest win
+my $lastWin = 0; # Count of Numbers drawn for the board with the slowest win
 my $bestBoard = -1; # Number of the winning board
+my $bestBoardSlow = -1; # Number of the last winning board
 my $bestScore = 0; # Score of the best board
+my $bestScoreSlow = 0; # Score of the slowest winning board
 my $currScore = 0; # Score of the current board to be calculated
 my $readIn = ''; 
 
@@ -72,10 +75,19 @@ for(my $i=0; $i<scalar(@boards); $i++) {
 
         if($num > 4 && checkForWinner(\%thisBoard)) {
             $currScore = getBoardSum(\%thisBoard) * $numDraw[$num];
+
+            # Part 1: Calc the score of the Fastest winning board
             if($fastestWin == -1 || $num < $fastestWin) {
                 $fastestWin = $num;
                 $bestScore = $currScore;
                 $bestBoard = $i;
+            }
+
+            # Part 2: Calc the score of the Slowest winnning board
+            if($lastWin < $num) {
+                $lastWin = $num;
+                $bestScoreSlow = $currScore;
+                $bestBoardSlow = $i;
             }
 
             $num = scalar(@numDraw);
@@ -83,13 +95,13 @@ for(my $i=0; $i<scalar(@boards); $i++) {
     }
 }
 
-print "There are " . scalar(@boards) . " boards to choose from.\n";
+print "There are " . scalar(@boards) . " boards to choose from.\n\n";
 
 # Part 1 answer:
 print "Best board is $bestBoard, with a score of $bestScore.\n\n";
 
 # Part 2 answer:
-#print "\n";
+print "Slowest board to win is $bestBoardSlow, with a score of $bestScoreSlow.\n";
 
 exit(0);
 #==========================================================================
