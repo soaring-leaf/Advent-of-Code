@@ -20,11 +20,11 @@ while(<INPUT>) {
 
     my $sum = 0; # sum for the rows
 
-    # Init a boardHash with a .. j = 0
-            # where a .. e is the number of row hits (top to bottom)
-            # f .. j = num of col hits (left to right)
+    # Init a boardHash with:
+            # r0 .. r4 = 0 - the number of row hits (top to bottom)
+            # c0 .. c4 = 0 - num of col hits (left to right)
             # s? = sum of each row where ? = row number
-    my %currBoard = ('a',0,'b',0,'c',0,'d',0,'e',0,'f',0,'g',0,'h',0,'i',0,'j',0); 
+    my %currBoard = ('r0',0,'r1',0,'r2',0,'r3',0,'r4',0,'c0',0,'c1',0,'c2',0,'c3',0,'c4',0); 
 
     for(my $row=0;$row<5;$row++) {
         my @newRow = split(' ',chomp(<INPUT>));
@@ -45,11 +45,37 @@ while(<INPUT>) {
 close(INPUT);
 
 # evaluate each board one at a time until it wins or runs out of drawn numbers
-# for each draw: 
-    # add one to the applicable a .. j Key count
+# for each draw and hit: 
+    # add one to the applicable row and column Key count
     # subtract the drawn number from the applicable row sum
 # after 5 draws and each after, check for a winner 
 # score the board and update the best board info if applicable
+
+my $rNum = 0; # row for a hit number
+my $cNum = 0; # col for a hit number
+
+for(my $i=0; $i<scalar(@boards); $i++) {
+    my %thisBoard = %{@board[$i]};
+
+    for(my $num=0; $num<scalar(@numDraw); $num++) {
+        if(exists($thisBoard{$numDraw[$num]})) {
+            ($rNum,$cNum) = split(',',$thisBoard{$numDraw[$num]});
+            $thisBoard{'r'.$rNum}++;
+            $thisBoard{'c'.$cNum}++;
+            $thisBoard{'s'.$rNum} -= $numDraw[$num];
+        }
+
+        if($num > 4 && checkForWinner(\%thisBoard)) {
+            $currScore = getBoardSum(\%thisBoard);
+            if($currScore > $bestScore) {
+                $bestScore = $currScore;
+                $bestBoard = $i;
+            }
+
+            $num = scalar(@numDraw);
+        }
+    }
+}
 
 # Part 1 answer:
 print "Best board is $bestBoard, with a score of $bestScore.\n\n";
@@ -61,7 +87,7 @@ exit(0);
 #==========================================================================
 # Input is a Bingo Board (Hash)
 sub checkForWinner {
-    # Run through a .. j keys to see if any = 5 (every number in row/col is hit)
+    # Run through r0 .. r4 and c0 .. c4 keys to see if any = 5 (every number in row/col is hit)
 }
 
 # gets the total sum of the numbers not hit from a winning board
