@@ -7,12 +7,12 @@ my @boards; # Array to hold each Hash-board
 my $bestBoard = -1; # Number of the winning board
 my $bestScore = 0; # Score of the best board
 my $currScore = 0; # Score of the current board to be calculated
-
-my %hashTest = ('a')
+my $readIn = ''; 
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 
-@numDraw = split(',',chomp(<INPUT>));
+$readIn = <INPUT>;
+@numDraw = split(',',chomp($readIn));
 
 # build the boards
 while(<INPUT>) {
@@ -27,11 +27,12 @@ while(<INPUT>) {
     my %currBoard = ('r0',0,'r1',0,'r2',0,'r3',0,'r4',0,'c0',0,'c1',0,'c2',0,'c3',0,'c4',0); 
 
     for(my $row=0;$row<5;$row++) {
-        my @newRow = split(' ',chomp(<INPUT>));
+        $readIn = <INPUT>;
+        my @newRow = split(' ',chomp($readIn));
 
         for (my $i=0;$i<scalar(@newRow);$i++) {
-            $sum += $newRow[i];
-            $currBoard{$newRow[i]} = $row . ',' . $i;
+            $sum += $newRow[$i];
+            $currBoard{$newRow[$i]} = $row . ',' . $i;
         }
 
         $currBoard{('s'.$row)} = $sum;
@@ -55,7 +56,7 @@ my $rNum = 0; # row for a hit number
 my $cNum = 0; # col for a hit number
 
 for(my $i=0; $i<scalar(@boards); $i++) {
-    my %thisBoard = %{@board[$i]};
+    my %thisBoard = %{$boards[$i]};
 
     for(my $num=0; $num<scalar(@numDraw); $num++) {
         if(exists($thisBoard{$numDraw[$num]})) {
@@ -92,11 +93,11 @@ sub checkForWinner {
 
     for(my $n=0; $n<5; $n++) {
         if($boardRef->{'r'.$n} == 5 || $boardRef->{'c'.$n} == 5) {
-            return TRUE;
+            return 1;
         }
     }
 
-    return FALSE;
+    return 0;
 }
 
 # gets the total sum of the numbers not hit from a winning board
