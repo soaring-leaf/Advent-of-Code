@@ -12,7 +12,8 @@ my $readIn = '';
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 
 $readIn = <INPUT>;
-@numDraw = split(',',chomp($readIn));
+chomp($readIn);
+@numDraw = split(',',$readIn);
 
 # build the boards
 while(<INPUT>) {
@@ -28,7 +29,8 @@ while(<INPUT>) {
 
     for(my $row=0;$row<5;$row++) {
         $readIn = <INPUT>;
-        my @newRow = split(' ',chomp($readIn));
+        chomp($readIn);
+        my @newRow = split(' ',$readIn);
 
         for (my $i=0;$i<scalar(@newRow);$i++) {
             $sum += $newRow[$i];
