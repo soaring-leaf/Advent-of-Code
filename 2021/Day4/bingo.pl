@@ -86,12 +86,27 @@ print "Best board is $bestBoard, with a score of $bestScore.\n\n";
 exit(0);
 #==========================================================================
 # Input is a Bingo Board (Hash)
+# checks the Row and Column counts to see if 5 numbers have been hit for a winning board
 sub checkForWinner {
-    # Run through r0 .. r4 and c0 .. c4 keys to see if any = 5 (every number in row/col is hit)
+    my $boardRef = $_[0];
+
+    for(my $n=0; $n<5; $n++) {
+        if($boardRef->{'r'.$n} == 5 || $boardRef->{'c'.$n} == 5) {
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
 
 # gets the total sum of the numbers not hit from a winning board
 sub getBoardSum {
-    # run through s0 .. s4 to add up the unmarked numbers
-    # return the total
+    my $boardSum = 0;
+    my $boardRef = $_[0];
+
+    for(my $s=0; $s<5; $s++) {
+        $boardSum += $boardRef->{'s'.$s};
+    }
+
+    return $boardSum;
 }
