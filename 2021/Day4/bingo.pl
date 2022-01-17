@@ -4,12 +4,14 @@ use strict;
 
 my @numDraw; # Array to hold the numbers in the order drawn
 my @boards; # Array to hold each Hash-board
+my $fastestWin = -1; # Count of Numbers drawn for the board with the fastest win
 my $bestBoard = -1; # Number of the winning board
 my $bestScore = 0; # Score of the best board
 my $currScore = 0; # Score of the current board to be calculated
 my $readIn = ''; 
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
+#open(INPUT,"<","testInput.txt") or die "Can't open Test Inptu file $!";
 
 $readIn = <INPUT>;
 chomp($readIn);
@@ -69,8 +71,9 @@ for(my $i=0; $i<scalar(@boards); $i++) {
         }
 
         if($num > 4 && checkForWinner(\%thisBoard)) {
-            $currScore = getBoardSum(\%thisBoard);
-            if($currScore > $bestScore) {
+            $currScore = getBoardSum(\%thisBoard) * $numDraw[$num];
+            if($fastestWin == -1 || $num < $fastestWin) {
+                $fastestWin = $num;
                 $bestScore = $currScore;
                 $bestBoard = $i;
             }
@@ -79,6 +82,8 @@ for(my $i=0; $i<scalar(@boards); $i++) {
         }
     }
 }
+
+print "There are " . scalar(@boards) . " boards to choose from.\n";
 
 # Part 1 answer:
 print "Best board is $bestBoard, with a score of $bestScore.\n\n";
