@@ -15,7 +15,7 @@ for(my $i=0; $i<990; $i++) {
 }
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
-#open(INPUT,"<","testInput.txt") or die "Can't open Test Inptu file $!";
+#open(INPUT,"<","testInput.txt") or die "Can't open Test Input file $!";
 
 while(<INPUT>) {
     chomp;
