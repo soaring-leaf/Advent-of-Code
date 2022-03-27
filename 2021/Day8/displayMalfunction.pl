@@ -4,7 +4,6 @@ use strict;
 
 my $digitCount = 0; # Counter for the simple digits (Part 1)
 my $outTotal = 0; # Sum of all the numbers from the output
-my @display; # each index is a unit of the 7-segment display from top to bottom and left to right
 
 # Order to determine segments: 0, 4, 3, 2, 5, 1, 6
 
@@ -29,6 +28,8 @@ open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 #open(INPUT,"<","testInput.txt") or die "Can't open Test Input file $!";
 
 while(<INPUT>) {
+    my @display; # each index is a unit of the 7-segment display from top to bottom and left to right
+
     chomp;
     my ($input, $output) = split(' \| ');
     my @outputUnits = split(' ',$output);
@@ -73,10 +74,12 @@ while(<INPUT>) {
     
     # then process the output
 
-    $outTotal += getOutputDigit($outputUnits[0]) * 1000;
-    $outTotal += getOutputDigit($outputUnits[1]) * 100;
-    $outTotal += getOutputDigit($outputUnits[2]) * 10;
-    $outTotal += getOutputDigit($outputUnits[3]);
+    $outTotal += getOutputDigit($outputUnits[0],\@display) * 1000;
+    $outTotal += getOutputDigit($outputUnits[1],\@display) * 100;
+    $outTotal += getOutputDigit($outputUnits[2],\@display) * 10;
+    $outTotal += getOutputDigit($outputUnits[3],\@display);
+
+    @display = '';
 }
 
 close(INPUT);
@@ -86,6 +89,7 @@ print "Number of 1's, 4's, 7's and 8's in the output is $digitCount\n";
 
 # Part 2 answer:
 print "Total sum of the output is $outTotal\n\n";
+print "but that's too high. something is wrong...\n\n";
 
 exit(0);
 #==========================================================================
@@ -183,6 +187,40 @@ sub getSeg6 {
 }
 
 sub getOutputDigit {
+    my $digit = $_[0];
+    my $len = length($digit);
+
+    if($len == 2) {
+        return 1;
+    } elsif($len == 3) {
+        return 7;
+    } elsif ($len == 4) {
+        return 4;
+    } elsif ($len == 7) {
+        return 8;
+    }
+
+    my $dsp = $_[1];
+
+    if($len == 5) {
+        if(index($digit,$dsp->[1]) == -1 && index($digit,$dsp->[5]) == -1) {
+            return 2;
+        } elsif(index($digit,$dsp->[1]) == -1 && index($digit,$dsp->[4]) == -1) {
+            return 3;
+        } else {
+            return 5;
+        }
+
+    } else { # length = 6
+        if(index($digit,$dsp->[3]) == -1) {
+            return 0;
+        } elsif(index($digit,$dsp->[2]) == -1) {
+            return 6;
+        } else {
+            return 9;
+        }
+    }
+
 
     return 1;
 }
