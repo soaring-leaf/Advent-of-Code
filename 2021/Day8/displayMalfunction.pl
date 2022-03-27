@@ -9,28 +9,28 @@ my $outTotal = 0; # Sum of all the numbers from the output
 
 ## NOTES to determine segment logic for the display
 # [0] - Compare 7 and 1, the extra segment in 7 goes here.
-# [1] - Using 1 and 5 group to find 3 - knowing [4], the remaining missing seg goes here
+# [1] - Using 1, [4] and 5 group, find 3 - knowing [4], the remaining missing seg goes here
 # [2] - Remaining item in 6 group is 6 - missing segment goes here
-# [3] - Using 1 and the 6 group, the one containing 1 is 0 - missing segment goes here.
-# [4] - Using 7, 4 and the 6 group, the one containing both 7 and 4 is 9 - missing seg goes here
+# [3] - Using 1 and the 6 group, the one containing 1 is 0 - missing seg goes here.
+# [4] - Using 4 and the 6 group, the one containing 4 is 9 - missing seg goes here
 # [5] - Using 1 and [2], the unassigned seg goes here
 # [6] - remaining unknown segment goes here
-
-my @group5; # array to hold digits of length 5
-my @group6; # array to hold digits of length 6
-my $one = ''; # var to hold segments for 1
-my $four = ''; # segments for 4
-my $seven = ''; # segments for 7
-my $eight = ''; # segments for 8
-my $tempRef = ''; # temp var for getting returned array ref
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 #open(INPUT,"<","testInput.txt") or die "Can't open Test Input file $!";
 
 while(<INPUT>) {
     my @display; # each index is a unit of the 7-segment display from top to bottom and left to right
+    my @group5; # array to hold digits of length 5
+    my @group6; # array to hold digits of length 6
+    my $one = ''; # var to hold segments for 1
+    my $four = ''; # segments for 4
+    my $seven = ''; # segments for 7
+    my $eight = ''; # segments for 8
+    my $tempRef = ''; # temp var for getting returned array ref
 
     chomp;
+
     my ($input, $output) = split(' \| ');
     my @outputUnits = split(' ',$output);
     my @inputUnits = split(' ',$input);
@@ -65,7 +65,7 @@ while(<INPUT>) {
 
     # run segment determining logic here
     $display[0] = getSeg0($one,$seven);
-    ($display[4], $tempRef) = getSeg4($seven,$four,\@group6);
+    ($display[4], $tempRef) = getSeg4($four,\@group6);
     ($display[3], $tempRef) = getSeg3($one,$tempRef);
     $display[2] = getSeg2($tempRef);
     $display[5] = getSeg5($one,$display[2]);
@@ -89,7 +89,6 @@ print "Number of 1's, 4's, 7's and 8's in the output is $digitCount\n";
 
 # Part 2 answer:
 print "Total sum of the output is $outTotal\n\n";
-print "but that's too high. something is wrong...\n\n";
 
 exit(0);
 #==========================================================================
@@ -155,13 +154,26 @@ sub getSeg3 {
 }
 
 sub getSeg4 {
-    my $s = $_[0];
-    my $f = $_[1];
-    my @g6 = @{$_[2]};
+    my ($f1,$f2,$f3,$f4) = split('',$_[0]);
+    my @g6 = @{$_[1]};
+    my $nine = '';
+    my @segCheck = ('a' .. 'g');
 
-    pop(@g6);
+    while($nine eq '') {
+        my $temp = shift(@g6);
 
-    return ('a',\@g6);
+        if(index($temp,$f1) >= 0 && index($temp,$f2) >= 0 && index($temp,$f3) >= 0 && index($temp,$f4) >= 0) {
+            $nine = $temp;
+        } else {
+            push(@g6,$temp);
+        }
+    }
+
+    foreach my $seg (@segCheck) {
+        if(index($nine,$seg) == -1) {
+            return ($seg,\@g6);
+        }
+    }
 }
 
 sub getSeg5 {
@@ -176,7 +188,8 @@ sub getSeg5 {
 }
 
 sub getSeg6 {
-    my $d = join(@{$_[0]});
+    my $d = join('',@{$_[0]});
+    
     my @segCheck = ('a' .. 'g');
 
     foreach my $seg (@segCheck) {
@@ -220,7 +233,4 @@ sub getOutputDigit {
             return 9;
         }
     }
-
-
-    return 1;
 }
