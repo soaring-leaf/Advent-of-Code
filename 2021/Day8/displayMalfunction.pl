@@ -73,10 +73,10 @@ while(<INPUT>) {
     
     # then process the output
 
-    #$outTotal += first * 1000;
-    #$outTotal += second * 100;
-    #$outTotal += third * 10;
-    #$outTotal += fourth;
+    $outTotal += getOutputDigit($outputUnits[0]) * 1000;
+    $outTotal += getOutputDigit($outputUnits[1]) * 100;
+    $outTotal += getOutputDigit($outputUnits[2]) * 10;
+    $outTotal += getOutputDigit($outputUnits[3]);
 }
 
 close(INPUT);
@@ -113,8 +113,8 @@ sub getSeg1 {
         }
     }
 
-    foreach $seg (@segCheck) {
-        if(index($three,$seg) == -1 && $seg != $s4) {
+    foreach my $seg (@segCheck) {
+        if(index($three,$seg) == -1 && $seg ne $s4) {
             return $seg;
         }
     }
@@ -124,7 +124,7 @@ sub getSeg2 {
     my $six = $_[0] -> [0];
     my @segCheck = ('a' .. 'g');
 
-    foreach $seg (@segCheck) {
+    foreach my $seg (@segCheck) {
         if(index($six,$seg) == -1) {
             return $seg;
         }
@@ -137,13 +137,13 @@ sub getSeg3 {
     my $zero = '';
     my @segCheck = ('a' .. 'g');
 
-    if(index($g6[0],$o1) >= 0 && index($g6[0],$o2) >= 0)) {
+    if(index($g6[0],$o1) >= 0 && index($g6[0],$o2) >= 0) {
         $zero = shift(@g6);
     } else {
         $zero = pop(@g6);
     }
 
-    foreach $seg (@segCheck) {
+    foreach my $seg (@segCheck) {
         if(index($zero,$seg) == -1) {
             return ($seg,\@g6);
         }
@@ -164,7 +164,7 @@ sub getSeg5 {
     my ($o1,$o2) = split('',$_[0]);
     my $s2 = $_[1];
 
-    if($s2 == $o1) {
+    if($s2 eq $o1) {
         return $o2;
     } else {
         return $o1;
@@ -175,9 +175,14 @@ sub getSeg6 {
     my $d = join(@{$_[0]});
     my @segCheck = ('a' .. 'g');
 
-    foreach $seg (@segCheck) {
+    foreach my $seg (@segCheck) {
         if(index($d,$seg) == -1) {
             return $seg;
         }
     }
+}
+
+sub getOutputDigit {
+
+    return 1;
 }
