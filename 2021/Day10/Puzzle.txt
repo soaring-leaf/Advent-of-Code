@@ -10,6 +10,7 @@ If a chunk opens with (, it must close with ).
 If a chunk opens with [, it must close with ].
 If a chunk opens with {, it must close with }.
 If a chunk opens with <, it must close with >.
+
 So, () is a legal chunk that contains no other chunks, as is []. More complex but valid chunks include ([]), {()()()}, <([{}])>, [<>({}){}[([])<>]], and even (((((((((()))))))))).
 
 Some lines are incomplete, but others are corrupted. Find and discard the corrupted lines first.
@@ -30,6 +31,7 @@ For example, consider the following navigation subsystem:
 [<(<(<(<{}))><([]([]()
 <{([([[(<>()){}]>(<<{{
 <{([{{}}[<[[[<>{}]]]>[]]
+
 Some of the lines aren't corrupted, just incomplete; you can ignore these lines for now. The remaining five lines are corrupted:
 
 {([(<{}[<>[]}>{[]{[(<()> - Expected ], but found } instead.
@@ -37,6 +39,7 @@ Some of the lines aren't corrupted, just incomplete; you can ignore these lines 
 [{[{({}]{}}([{[{{{}}([] - Expected ), but found ] instead.
 [<(<(<(<{}))><([]([]() - Expected >, but found ) instead.
 <{([([[(<>()){}]>(<<{{ - Expected ], but found > instead.
+
 Stop at the first incorrect closing character on each corrupted line.
 
 Did you know that syntax checkers actually have contests to see who can get the high score for syntax errors in a file? It's true! To calculate the syntax error score for a line, take the first illegal character on the line and look it up in the following table:
@@ -45,6 +48,7 @@ Did you know that syntax checkers actually have contests to see who can get the 
 ]: 57 points.
 }: 1197 points.
 >: 25137 points.
+
 In the above example, an illegal ) was found twice (2*3 = 6 points), an illegal ] was found once (57 points), an illegal } was found once (1197 points), and an illegal > was found once (25137 points). So, the total syntax error score for this file is 6+57+1197+25137 = 26397 points!
 
 Find the first illegal character in each corrupted line of the navigation subsystem. What is the total syntax error score for those errors?
@@ -67,12 +71,14 @@ In the example above, there are five incomplete lines:
 (((({<>}<{<{<>}{[]{[]{} - Complete by adding }}>}>)))).
 {<[[]]>}<{[{[{[]{()[[[] - Complete by adding ]]}}]}]}>.
 <{([{{}}[<[[[<>{}]]]>[]] - Complete by adding ])}>.
+
 Did you know that autocomplete tools also have contests? It's true! The score is determined by considering the completion string character-by-character. Start with a total score of 0. Then, for each character, multiply the total score by 5 and then increase the total score by the point value given for the character in the following table:
 
 ): 1 point.
 ]: 2 points.
 }: 3 points.
 >: 4 points.
+
 So, the last completion string above - ])}> - would be scored as follows:
 
 Start with a total score of 0.
@@ -87,6 +93,7 @@ The five lines' completion strings have total scores as follows:
 }}>}>)))) - 1480781 total points.
 ]]}}]}]}> - 995444 total points.
 ])}> - 294 total points.
+
 Autocomplete tools are an odd bunch: the winner is found by sorting all of the scores and then taking the middle score. (There will always be an odd number of scores to consider.) In this example, the middle score is 288957 because there are the same number of scores smaller and larger than it.
 
 Find the completion string for each incomplete line, score the completion strings, and sort the scores. What is the middle score?

@@ -5,6 +5,8 @@ use strict;
 my $errorScore = 0; # Sum for the Error Points
 my $corrupted = 0; # Counter for the Corrupted lines
 my $incomplete = 0; # Counter for the Incomplete lines
+my @linesToFix; # Array to hold the incomplete lines to auto-complete
+my @fixedScore; # Array to hold the score of each fixed line
 my $lineCount = 0; # Counter for the lines of input
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
@@ -59,17 +61,23 @@ while(<INPUT>) {
     # check for Incomplete lines
     if(!$cFlag && scalar(@checker) > 0) {
         $incomplete++;
+        push(@linesToFix,\@checker); # only need the remaining open chunks
     }
 }
 
 close(INPUT);
 
-# Part 0 answer:
+# run through linesToFix array and score the remaining chunks to close for each line
+# Add score to fixedScore array
+
+# sort fixedScore array and find median score
+
+# Part 1 answer:
 print "Of all the lines ($lineCount), $incomplete were incomplete and \n";
 print "$corrupted were corrupted for a score of $errorScore.\n";
 
 # Part 2 answer:
-print "\n\n";
+print "The middle score for the incomplete lines is: \n\n";
 
 exit(0);
 #==========================================================================
