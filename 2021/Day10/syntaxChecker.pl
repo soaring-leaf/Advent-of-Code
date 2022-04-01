@@ -8,6 +8,7 @@ my $incomplete = 0; # Counter for the Incomplete lines
 my @linesToFix; # Array to hold the incomplete lines to auto-complete
 my @fixedScore; # Array to hold the score of each fixed line
 my $lineCount = 0; # Counter for the lines of input
+my $medianScore = 0; # Var to hold the Median value of the fixed lines
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 #open(INPUT,"<","testInput.txt") or die "Can't open Test Input file $!";
@@ -69,15 +70,31 @@ close(INPUT);
 
 # run through linesToFix array and score the remaining chunks to close for each line
 # Add score to fixedScore array
+for(my $i=0; $i < scalar(@linesToFix); $i++) {
+    my @arr = @{$linesToFix[$i]};
+    my $lineScore = 0;
+
+    while(scalar(@arr) > 0) {
+        my $char = reverseChar(pop(@arr));
+
+        $lineScore = $lineScore * 5;
+        $lineScore += getCloseChunkScore($char);
+    }
+
+    push(@fixedScore,$lineScore);
+}
 
 # sort fixedScore array and find median score
+@fixedScore = sort {$a <=> $b} @fixedScore;
+
+$medianScore = $fixedScore[(scalar(@fixedScore)-1)/2];
 
 # Part 1 answer:
 print "Of all the lines ($lineCount), $incomplete were incomplete and \n";
-print "$corrupted were corrupted for a score of $errorScore.\n";
+print "$corrupted were corrupted for a score of $errorScore.\n\n";
 
 # Part 2 answer:
-print "The middle score for the incomplete lines is: \n\n";
+print "The middle score for the incomplete lines is: $medianScore\n\n";
 
 exit(0);
 #==========================================================================
@@ -92,5 +109,19 @@ sub reverseChar {
         return '}';
     } else {
         return '>';
+    }
+}
+
+sub getCloseChunkScore {
+    my $c = $_[0];
+
+    if($c eq ')') {
+        return 1;
+    } elsif($c eq ']') {
+        return 2;
+    } elsif($c eq '}') {
+        return 3;
+    } else {
+        return 4;
     }
 }
