@@ -42,9 +42,9 @@ exit(0);
 sub advanceStep {
     my $grid = $_[0];
 
-    for(my $c=0; $c < 10; $c++) {
-        for(my $r=0; $r < 10; $r++) {
-            $grid->[$c][$r]++;
+    for(my $r=0; $r < 10; $r++) {
+        for(my $c=0; $c < 10; $c++) {
+            $grid->[$r][$c]++;
         }
     }
 }
@@ -54,7 +54,8 @@ sub countFlashes {
     my $count = 0;
     my @grid = @{$_[0]};
     my @copyGrid = @{copyOctos($_[0])}; # copy of octoGrid to process the flashes
-    my @transferArr; # Array Reference to transfer the copy array to the grid var
+    my $transferArr1; # Array Reference to transfer the copy array to the grid var
+    my $transferArr2; # Array Reference to transfer the copy array to the grid var
     my $flashFlag = -1; # Flag indicating found flashes, need to go over the grid again
 
     # for each grid position, if octo is 10+, update the surrounding octos in Copy
@@ -65,54 +66,56 @@ sub countFlashes {
     while($flashFlag > 0 || $flashFlag == -1) {
         $flashFlag = 0;
 
-        for(my $c=0; $c < 10; $c++) {
-            for(my $r=0; $r < 10; $r++) {
-                if($grid[$c][$r] > 9) {
+        print "copy of grid: \n";
+        printSteps(\@copyGrid);
+
+        for(my $r=0; $r < 10; $r++) {
+            for(my $c=0; $c < 10; $c++) {
+                if($grid[$r][$c] > 9) {
                     $flashFlag++;
                     $count++;
-                    $grid[$c][$r] = 0;
-                    $copyGrid[$c][$r] = 0;
-
-                    if($c > 0) {
-                        if($copyGrid[$c-1][$r] != 0) {
-                            $copyGrid[$c-1][$r]++;
-                        }
-                        if($r > 0) {
-                            if($copyGrid[$c-1][$r-1] != 0) {
-                                $copyGrid[$c-1][$r-1]++;
-                            }
-                        }
-                        if($r < 10) {
-                            if($copyGrid[$c-1][$r+1] != 0) {
-                                print "$c,$r\n";
-                                $copyGrid[$c-1][$r+1]++;
-                            }
-                        }
-                    }
+                    $grid[$r][$c] = 0;
+                    $copyGrid[$r][$c] = 0;
 
                     if($r > 0) {
-                        if($copyGrid[$c][$r-1] != 0) {
-                            $copyGrid[$c][$r-1]++;
+                        if($copyGrid[$r-1][$c] != 0) {
+                            $copyGrid[$r-1][$c]++;
                         }
-                    }
-                    if($r < 10) {
-                        if($copyGrid[$c][$r+1] != 0) {
-                            $copyGrid[$c][$r+1]++;
+                        if($c > 0) {
+                            if($copyGrid[$r-1][$c-1] != 0) {
+                                $copyGrid[$r-1][$c-1]++;
+                            }
+                        }
+                        if($c < 9) {
+                            if($copyGrid[$r-1][$c+1] != 0) {
+                                $copyGrid[$r-1][$c+1]++;
+                            }
                         }
                     }
 
-                    if($c < 10) {
-                        if($copyGrid[$c+1][$r] != 0) {
-                            $copyGrid[$c+1][$r]++;
+                    if($c > 0) {
+                        if($copyGrid[$r][$c-1] != 0) {
+                            $copyGrid[$r][$c-1]++;
                         }
-                        if($r > 0) {
-                            if($copyGrid[$c+1][$r-1] != 0) {
-                                $copyGrid[$c+1][$r-1]++;
+                    }
+                    if($c < 9) {
+                        if($copyGrid[$r][$c+1] != 0) {
+                            $copyGrid[$r][$c+1]++;
+                        }
+                    }
+
+                    if($r < 9) {
+                        if($copyGrid[$r+1][$c] != 0) {
+                            $copyGrid[$r+1][$c]++;
+                        }
+                        if($c > 0) {
+                            if($copyGrid[$r+1][$c-1] != 0) {
+                                $copyGrid[$r+1][$c-1]++;
                             }
                         }
-                        if($r < 10) {
-                            if($copyGrid[$c+1][$r+1] != 0) {
-                                $copyGrid[$c+1][$r+1]++;
+                        if($c < 9) {
+                            if($copyGrid[$r+1][$c+1] != 0) {
+                                $copyGrid[$r+1][$c+1]++;
                             }
                         }
                     }
@@ -120,10 +123,11 @@ sub countFlashes {
             }
         }
 
-        @transferArr = @copyGrid;
-        @copyGrid = @grid;
-        @grid = @transferArr;
+        $transferArr1 = \@copyGrid;
+        $transferArr2 = \@grid;
 
+        @grid = @{$transferArr1};
+        @copyGrid = @{$transferArr2};
     }
 
     # return updated grid and total number of flashes for this entire step
@@ -132,25 +136,22 @@ sub countFlashes {
 
 sub copyOctos {
     my @grid = @{$_[0]};
-    my @copy; 
+    my @newcopy;
 
-    for(my $c=0; $c < 10; $c++) {
-        my @row;
-        for(my $r=0; $r < 10; $r++) {
-            push(@row,$grid[$c][$r]);
-        }
-        push(@copy,\@row);
+    for(my $r=0; $r < 10; $r++) {
+        my @col = @{$grid[$r]};
+        push(@newcopy,\@col);
     }
 
-    return \@copy;
+    return \@newcopy;
 }
 
 sub printSteps {
     my @oGrid = @{$_[0]};
 
-    for(my $c=0; $c < 10; $c++) {
-        for(my $r=0; $r < 10; $r++) {
-            print $oGrid[$c][$r];
+    for(my $r=0; $r < 10; $r++) {
+        for(my $c=0; $c < 10; $c++) {
+            print $oGrid[$r][$c];
         }
         print "\n";
     }
