@@ -5,10 +5,12 @@ use strict;
 my $flashCount = 0; # Count of flashes
 my @octopiGrid; # main grid of the energy level for each octopus
 my $gridRef; # Reference for returning the octopiGrid
-my $stepCount = 0; # count returned for each step
+my $flashStepCount = 0; # count returned for each step
+my $stepCount = 100; # count of each step (start counting after first 100 steps)
+my $synchedUp = ''; # Flag to find when the octos synch up
 
-#open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
-open(INPUT,"<","testInput.txt") or die "Can't open Test Input file $!";
+open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
+#open(INPUT,"<","testInput.txt") or die "Can't open Test Input file $!";
 
 while(<INPUT>) {
     chomp;
@@ -19,33 +21,58 @@ while(<INPUT>) {
 
 close(INPUT);
 
-for(my $s=0; $s < 10; $s++) {
-    print "Step $s:\n";
-    printSteps(\@octopiGrid);
+# Part 1 - First 100 steps
+for(my $s=0; $s < 100; $s++) {
+    #print "Step $s:\n";
+    #printSteps(\@octopiGrid);
 
     advanceStep(\@octopiGrid);
-    ($gridRef,$stepCount) = countFlashes(\@octopiGrid);
+    ($gridRef,$flashStepCount) = countFlashes(\@octopiGrid);
 
-    $flashCount += $stepCount;
+    $flashCount += $flashStepCount;
     @octopiGrid = @{$gridRef};
+}
+
+# Part 2 - Find step where they all synch up
+while($synchedUp ne 'Synched') {
+    $synchedUp = advanceStep(\@octopiGrid);
+
+    if($synchedUp ne 'Synched') {
+        $stepCount++;
+        ($gridRef,$flashStepCount) = countFlashes(\@octopiGrid);
+
+        @octopiGrid = @{$gridRef};
+    }
 }
 
 # Part 1 answer:
 print "After 100 steps, there were $flashCount flashes.\n\n";
 
 # Part 2 answer:
-print "\n\n";
+print "Octopi start synching up after $stepCount steps.\n\n";
 
 exit(0);
 #==========================================================================
 # Takes OctopiGrid and updates each octopus with +1 energy
+# check for synching flashes - if all are at 9 flag it!
 sub advanceStep {
     my $grid = $_[0];
+    my $justFlashed = 0;
 
     for(my $r=0; $r < 10; $r++) {
         for(my $c=0; $c < 10; $c++) {
+            if($grid->[$r][$c] == 0) {
+                $justFlashed++;
+            }
+
             $grid->[$r][$c]++;
         }
+    }
+
+    if($justFlashed == 100) {
+        return "Synched";
+    } else {
+        return "Not Synched";
     }
 }
 
@@ -66,8 +93,8 @@ sub countFlashes {
     while($flashFlag > 0 || $flashFlag == -1) {
         $flashFlag = 0;
 
-        print "copy of grid: \n";
-        printSteps(\@copyGrid);
+        #print "copy of grid: \n";
+        #printSteps(\@copyGrid);
 
         for(my $r=0; $r < 10; $r++) {
             for(my $c=0; $c < 10; $c++) {
