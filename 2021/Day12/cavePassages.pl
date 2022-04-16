@@ -3,7 +3,6 @@ use warnings;
 use strict;
 
 my %caveConnections; # List of all the passages between rooms in cave
-my %roomSize; # List of the rooms and if they are Big (1) or little (0)
 my $pathCount = 0; # count of viable paths
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
@@ -12,18 +11,6 @@ open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 while(<INPUT>) {
     chomp;
     my ($first, $second) = split('-',$_);
-
-    if($first eq uc($first)) {
-        $roomSize{$first} = 1;
-    } else {
-        $roomSize{$first} = 0;
-    }
-    
-    if($second eq uc($second)) {
-        $roomSize{$second} = 1;
-    } else {
-        $roomSize{$second} = 0;
-    }
 
     # Start is one way out, no need to build paths FROM End
     
@@ -55,13 +42,13 @@ close(INPUT);
 foreach my $k (keys %caveConnections) {
     my @sorted = sort {lc($b) cmp lc($a)} @{$caveConnections{$k}};
     $caveConnections{$k} = \@sorted;
-    print "$k: ";
-    printPath($caveConnections{$k}); # connections list
+    #print "$k: ";
+    #printPath($caveConnections{$k}); # connections list
 }
 
 print "\n\n";
 
-$pathCount = traverseCave(\%caveConnections,\%roomSize,['start']);
+$pathCount = traverseCave(\%caveConnections,['start']);
 
 # Part 1 answer:
 print "There are $pathCount paths through the cave.\n\n";
@@ -84,16 +71,51 @@ sub printPath {
 sub traverseCave {
     my $pCount = 0; # count of paths calculated
     my $roomHashRef = $_[0]; # reference to the room hash
-    my $roomSizeRef = $_[1]; # ref to the Room Size hash
-    my @currPath = @{$_[2]}; # Current path already taken
+    my @currPath = @{$_[1]}; # Current path already taken
     my $currRoom = $currPath[scalar(@currPath)-1]; # current Room
+
+    # protect code from runaway recursion
+    if(scalar(@currPath) > 15) {
+        print "Panic! Something is wrong!\n";
+        printPath(@currPath);
+        return 0; 
+    }
 
     # for each connection in the current room:
     # 1. check size and if small room, see if it's already been visited
     # 2. if so, skip it and check next one
     # 3. if ok to visit, push it on the current Path array and recurse (add returned result to path Count)
-    # 4. if no more rooms are available to visit, return 0 (can't reach exit)
-    # 5. if 'end' is found, print path and return 1
+    # 4. if no more rooms are available to visit, return pCount (end of options)
+    # 5. if 'end' is found, (don't) print path and add 1 to pCount
+
+    foreach my $r (@{$roomHashRef->{$currRoom}}) {
+        my $checkFlag = 0; # Flag to see if a small room is already in the path
+
+        if($r eq 'end') {
+            #push(@currPath,'end');
+            #printPath(\@currPath);
+            #pop(@currPath);
+
+            $checkFlag++; # Found end, nowhere else to go
+            $pCount++;
+        }
+
+        if($r eq lc($r) && $r ne 'end') {
+            foreach my $p (@currPath) {
+                if($r eq $p) {
+                    $checkFlag++;
+                }
+            }
+        }
+
+        if(!$checkFlag) {
+            push(@currPath,$r); # add next room to path and recurse
+
+            $pCount += traverseCave($roomHashRef,\@currPath);
+
+            pop(@currPath); # remove this room from the path to try the next available room in the list
+        }
+    }
 
     return $pCount;
 }
