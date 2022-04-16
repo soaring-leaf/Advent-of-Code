@@ -30,8 +30,8 @@ my %bitPosCounterForValue1 = (
         11 => 0
     );
 
-
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
+#open(INPUT,"<","testinput.txt") or die "Can't open testInput.txt $!";
 
 while(<INPUT>) {
     $count++;
@@ -83,11 +83,11 @@ my $gammaLeadBit = substr($gammaBitValue,0,1); # Value of the first bit of Gamma
 my $currO2Count = 0; # current match value for the O2 Generator
 my $currCO2Count = 0; # same for the CO2 Scrubber
 my $maxBit = 0; # value of the bit found most frequently in the current check
-my $minBit = 0; # value of the bit found most frequently in the current check
+my $minBit = 0; # value of the bit found least frequently in the current check
 my $bitCount = 1; # Iterator for the Bit Position being reviewed
 
 # Run through each Diagnostic row output and determine the diagnostic line options for each device
-for(my $m=0;$m<scalar(@diagnosticRpt);$m++) {
+for(my $m=0; $m<scalar(@diagnosticRpt); $m++) {
     
     my @diagnosticVal = @{$diagnosticRpt[$m]};
 
@@ -97,7 +97,6 @@ for(my $m=0;$m<scalar(@diagnosticRpt);$m++) {
     } else {
         push(@CO2ScrubOptions,\@diagnosticVal);
     }
-
 }
 
 $currO2Count = scalar(@O2GenOptions);
@@ -128,15 +127,14 @@ while($currO2Count > 1) {
 $bitCount = 1;
 
 while($currCO2Count > 1) {
-    print "In while with $currCO2Count options remaining to check\n";
     @nextCO2List = ();
 
-    # find most frequent bit value for current position
+    # find least frequent bit value for current position
     $minBit = bitCounter(\@CO2ScrubOptions,$bitCount,0);
-    print "min bit returned = $minBit\n";
+    
     # build the next Option list from the current options
-    for(my $o=0;$o<$currCO2Count;$o++) {
-        if($CO2ScrubOptions[$o][$bitCount] == $maxBit) {
+    for(my $o=0; $o<$currCO2Count; $o++) {
+        if($CO2ScrubOptions[$o][$bitCount] == $minBit) {
             push(@nextCO2List,$CO2ScrubOptions[$o]);
         }
     }
@@ -144,14 +142,9 @@ while($currCO2Count > 1) {
     $currCO2Count = scalar(@nextCO2List);
     @CO2ScrubOptions = @nextCO2List;
     $bitCount++;
-    print "Checked position $bitCount, have $currO2Count options remaining\n";
 }
 
 @CO2BestMatch = @{$CO2ScrubOptions[0]};
-
-# Found whitespace at end of array that needs to be removed
-pop(@O2BestMatch);
-pop(@CO2BestMatch);
 
 # pull the Binary values of the ratings and convert to Decimal and then calc the Life Support rating
 $O2GenRating = oct("0b".join('',@O2BestMatch));
@@ -175,7 +168,7 @@ sub bitCounter {
     my $pos = pop(@_);
     my @options = @{$_[0]};
     
-    for(my $i=0;$i<scalar(@options);$i++) {
+    for(my $i=0; $i<scalar(@options); $i++) {
         if($options[$i][$pos] eq '1') {
             $oneCount++;
         } else {
