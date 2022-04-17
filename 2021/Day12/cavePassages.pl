@@ -4,6 +4,7 @@ use strict;
 
 my %caveConnections; # List of all the passages between rooms in cave
 my $pathCount = 0; # count of viable paths
+my $pathCountPt2 = 0; # count for Part2
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 #open(INPUT,"<","testInput.txt") or die "Can't open Test Input file $!";
@@ -46,15 +47,17 @@ foreach my $k (keys %caveConnections) {
     #printPath($caveConnections{$k}); # connections list
 }
 
-print "\n\n";
+print "\n";
 
-$pathCount = traverseCave(\%caveConnections,['start']);
+$pathCount = traverseCavePt1(\%caveConnections,['start']);
 
 # Part 1 answer:
-print "There are $pathCount paths through the cave.\n\n";
+print "There are $pathCount paths through the cave visiting small rooms only once.\n\n";
+
+$pathCountPt2 = traverseCavePt2(\%caveConnections,['start']);
 
 # Part 2 answer:
-print "\n\n";
+print "Visiting small rooms once or twice, there are $pathCountPt2 paths.\n\n";
 
 exit(0);
 #==========================================================================
@@ -68,13 +71,13 @@ sub printPath {
 # Recursive function to find a path through the cave given a starting room and
 # the current path already taken. 
 # If End is reached return 1, if no path is available, return 0
-sub traverseCave {
+sub traverseCavePt1 {
     my $pCount = 0; # count of paths calculated
     my $roomHashRef = $_[0]; # reference to the room hash
     my @currPath = @{$_[1]}; # Current path already taken
     my $currRoom = $currPath[scalar(@currPath)-1]; # current Room
 
-    # protect code from runaway recursion
+    # protect code from runaway recursion during testing
     if(scalar(@currPath) > 15) {
         print "Panic! Something is wrong!\n";
         printPath(@currPath);
@@ -111,7 +114,64 @@ sub traverseCave {
         if(!$checkFlag) {
             push(@currPath,$r); # add next room to path and recurse
 
-            $pCount += traverseCave($roomHashRef,\@currPath);
+            $pCount += traverseCavePt1($roomHashRef,\@currPath);
+
+            pop(@currPath); # remove this room from the path to try the next available room in the list
+        }
+    }
+
+    return $pCount;
+}
+
+sub checkDoubleSmallVisit {
+    my @cP = @{$_[0]};
+    my $doubleVisit = 0;
+
+    for(my $i=0; $i < scalar(@cP)-1; $i++) {
+        if($cP[$i] ne uc($cP[$i])) {
+            for(my $k=($i+1); $k < scalar(@cP); $k++) {
+                if($cP[$i] eq $cP[$k]) {
+                    $doubleVisit++;
+                    return $doubleVisit;
+                }
+            }
+        }
+    }
+
+    return $doubleVisit;
+}
+
+# Same steps as Part1 except need to keep a count of the small rooms visited
+# since we can visit a small room a second time
+sub traverseCavePt2 {
+    my $pCount = 0; # count of paths calculated
+    my $roomHashRef = $_[0]; # reference to the room hash
+    my @currPath = @{$_[1]}; # Current path already taken
+    my $currRoom = $currPath[scalar(@currPath)-1]; # current Room
+
+    # flag to see if a small room has already been visited twice in the current path
+    my $doubleSmallCheck = checkDoubleSmallVisit(\@currPath);  
+
+    foreach my $r (@{$roomHashRef->{$currRoom}}) {
+        my $checkFlag = 0; # Flag to see if a small room is already in the path
+
+        if($r eq 'end') {
+            $checkFlag = 3; # Found end, nowhere else to go
+            $pCount++;
+        }
+
+        if($r eq lc($r) && $r ne 'end') {
+            foreach my $p (@currPath) {
+                if($r eq $p) {
+                    $checkFlag++;
+                }
+            }
+        }
+
+        if(!$checkFlag || ($checkFlag < 2 && !$doubleSmallCheck)) {
+            push(@currPath,$r); # add next room to path and recurse
+
+            $pCount += traverseCavePt2($roomHashRef,\@currPath);
 
             pop(@currPath); # remove this room from the path to try the next available room in the list
         }
