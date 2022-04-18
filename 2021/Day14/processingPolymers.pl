@@ -28,7 +28,7 @@ while(<INPUT>) {
     
     # Add the first element of the pairing to the result because
     # it needs to be added back anyway
-    $polyTemplate{$pairing} = substr($pairing,0,1) . $rule;
+    $polyTemplate{$pairing} = [substr($pairing,0,1) . $rule,$rule];
 
     $elements{$rule} = 0;
 }
@@ -54,6 +54,11 @@ print "Difference between the Most and Least common elements is " . ($mostCommon
 
 # Part 2 answer:
 # EFFICIENCY ISSUE with 40 steps...will take too long to complete
+for(my $k=10; $k < 40; $k++) {
+    $polymer = processPolymer($polymer,\%elements,\%polyTemplate);
+    print "step $k complete.\n";
+}
+
 #print "\n\n";
 
 exit(0);
@@ -85,11 +90,12 @@ sub processPolymer {
     for(my $i=0; $i < length($poly) - 1; $i++) {
         my $currPair = substr($poly,$i,2);
 
-        if(exists($templateRef->{$currPair})) {
-            $newPoly = $newPoly . $templateRef->{$currPair};
-            $eleCountRef->{substr($templateRef->{$currPair},1,1)}++;
+        if(exists($templateRef->{$currPair}->[0])) {
+            $newPoly = $newPoly . $templateRef->{$currPair}->[0];
+            $eleCountRef->{$templateRef->{$currPair}->[1]}++;
         } else {
             $newPoly = $newPoly . substr($currPair,0,1);
+            print "no match for $currPair!\n";
         }
     }
 
