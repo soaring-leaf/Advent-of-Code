@@ -27,7 +27,7 @@ while(<INPUT>) {
     my ($pairing, $rule) = split(' -> ');
     
     # Add the first element of the pairing to the result because
-    # it needs to be added back anyway
+    # it needs to be added back anyway 
     $polyTemplate{$pairing} = [substr($pairing,0,1) . $rule,$rule];
 
     $elements{$rule} = 0;
@@ -45,6 +45,7 @@ foreach my $e (@eleArray) {
 # Process the polymer 10 times
 for(my $i=0; $i < 10; $i++) {
     $polymer = processPolymer($polymer,\%elements,\%polyTemplate);
+    print "step $i complete.\n";
 }
 
 ($mostCommon, $leastCommon) = getMostLeastFrequent(\%elements);
@@ -54,10 +55,12 @@ print "Difference between the Most and Least common elements is " . ($mostCommon
 
 # Part 2 answer:
 # EFFICIENCY ISSUE with 40 steps...will take too long to complete
-for(my $k=10; $k < 40; $k++) {
-    $polymer = processPolymer($polymer,\%elements,\%polyTemplate);
-    print "step $k complete.\n";
-}
+
+# What if take each initial pair and run it out 40 steps? - NOPE!
+# What if when a given pair is updated, that template result also updates?
+    # Need to figure out how to overlap for the next pair so not to overcount
+    # Also need to figure out how to count the new elements added in the bigger groups
+        # Otherwise, would run out of time just counting at the end...
 
 #print "\n\n";
 
@@ -70,7 +73,7 @@ sub getMostLeastFrequent {
     my $little = -1;
 
     foreach my $e (keys(%eleHash)) {
-        #print "$e: $eleHash{$e}\n";
+        print "$e: $eleHash{$e}\n";
         if($eleHash{$e} > $big) {
             $big = $eleHash{$e};
         }
@@ -90,13 +93,9 @@ sub processPolymer {
     for(my $i=0; $i < length($poly) - 1; $i++) {
         my $currPair = substr($poly,$i,2);
 
-        if(exists($templateRef->{$currPair}->[0])) {
-            $newPoly = $newPoly . $templateRef->{$currPair}->[0];
-            $eleCountRef->{$templateRef->{$currPair}->[1]}++;
-        } else {
-            $newPoly = $newPoly . substr($currPair,0,1);
-            print "no match for $currPair!\n";
-        }
+        $newPoly = $newPoly . $templateRef->{$currPair}->[0];
+        $eleCountRef->{$templateRef->{$currPair}->[1]}++;
+        
     }
 
     $newPoly = $newPoly . substr($poly,-1);
