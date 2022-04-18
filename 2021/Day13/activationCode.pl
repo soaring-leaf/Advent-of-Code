@@ -47,11 +47,35 @@ print "Additionally, there are " . scalar(@instr) . " fold instructions.\n\n";
 # First fold (Part1)
 foldPaper(split('=',shift(@instr)),\%marks);
 
+$maxX = $maxX/2;
+
 # Part 1 answer:
 print "After the first Fold, there are " . scalar(keys(%marks)) . " marks showing.\n\n";
 
+# Part 2: Follow the remaining Fold Instructions and print the resulting paper
+foreach my $i (@instr) {
+    foldPaper(split('=',$i),\%marks);
+    
+    if(substr($i,0,1) eq 'x') {
+        $maxX = $maxX/2;
+    } else {
+        $maxY = $maxY/2;
+    }
+}
+
 # Part 2 answer:
-#print "\n\n";
+print "Activation code is:\n";
+
+for(my $row=0; $row < $maxY; $row++) {
+    for(my $col=0; $col < $maxX; $col++) {
+        if(exists($marks{($col.",".$row)})) {
+            print "#";
+        } else {
+            print ".";
+        }
+    }
+    print "\n";
+}
 
 exit(0);
 #==========================================================================
