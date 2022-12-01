@@ -3,8 +3,8 @@ use warnings;
 use strict;
 
 my $currTotal = 0; # calories current elf is carrying
-my $max = -1; # Max calorie count
-my $elves = 0; # elf count
+my $top3 = -1; # Calorie count for the top 3 elves
+my @elves; # elf calorie array
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 
@@ -14,10 +14,7 @@ while(<INPUT>) {
     my $item = $_;
 
     if(length($item) == 0) {
-        if($currTotal > $max) {
-            $max = $currTotal;
-        }
-        $elves++;
+        push(@elves,$currTotal);
         $currTotal = 0;
     } else {
         $currTotal += $item;
@@ -25,19 +22,18 @@ while(<INPUT>) {
 }
 
 close(INPUT);
+push(@elves,$currTotal);
 
-if($currTotal > $max) {
-    $max = $currTotal;
-}
-$elves++;
+@elves = sort {$b <=> $a} @elves;
 
 # Part 1 answer:
-print "There are $elves elves on this expedition!\n";
-print "The Elf carrying the most food has $max calories worth.\n";
+print "There are " . scalar(@elves) . " elves on this expedition!\n";
+print "The Elf carrying the most food has $elves[0] calories worth.\n";
 
-# reset vars for Part 2
+# Part 2
+$top3 = $elves[0] + $elves[1] + $elves[2];
 
-# Part 2: 
+print "The 3 Elves carrying the most calories have a total of $top3\n";
 
 exit(0);
 #==========================================================================
