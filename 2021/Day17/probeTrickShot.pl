@@ -11,6 +11,7 @@ my $initX = 0; # Initial X Velocity
 my $maxVelX = 0; # Max X velocity while still hitting correct range
 my $initY = 0; # Initial Y Velocity
 my $bestVelY = 0; # highest Y Velocity Launch while hitting Target Area
+my $peakProbe = 0; # highest the probe can go and still hit Target Area
 
 # Scenarios where Probe will never hit:
 #   - if x velocity = 0 and < minX
@@ -41,9 +42,23 @@ print "Min X velocity to get to target area is: $initX\n";
 print "Max possible X Velocity is: $maxVelX\n";
 
 # progress with higher launches until probe pings within target
+# physics says time up = time down AND V up = V down so at X = 0, Y up = -Y down
 
+while($initY > $maxD) {
+    $initY--;
 
-print "Highest Launch while hitting Target Area: $bestVelY\n";
+    $found = stepThroughY($initY,$minD,$maxD);
+
+    if($found > 0 && abs($initY) > $bestVelY) {
+        $bestVelY = abs($initY);
+    }
+}
+
+print "Highest Launch velocity while hitting Target Area: $bestVelY\n";
+
+$peakProbe = calcPeak($bestVelY);
+
+print "Highest the probe goes is $peakProbe\n\n";
 
 # Part 2:
 
@@ -64,4 +79,32 @@ sub stepThroughX {
     } else {
         return 0;
     }
+}
+
+sub stepThroughY {
+    (my $init, my $min, my $max) = @_;
+    my $yPos = 0;
+
+    while($yPos > $max) {
+        $yPos += $init;
+
+        if($yPos < $max && $yPos < $min) {
+            return 1;
+        }
+        
+        $init--;
+    }
+
+    return 0;
+}
+
+sub calcPeak {
+    my $v = $_[0];
+    my $h = 0;
+
+    for($v;$v>0;$v--) {
+        $h += $v;
+    }
+
+    return $h;
 }
