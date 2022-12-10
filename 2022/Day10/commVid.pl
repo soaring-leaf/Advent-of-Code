@@ -4,14 +4,12 @@ use strict;
 
 my $x = 1; # X register
 my $cycle = 0; # Cycle counter
-my @instr; # Array holding the program instructions
 my $sigStrength = 0; # Sum of the critical cycle signals
 
 open(INPUT,"<","input.txt") or die "Can't open Input.txt $!";
 
 while(<INPUT>) {
     chomp;
-    push(@instr,$_);
 
     $cycle++;
 
